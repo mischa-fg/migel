@@ -1,0 +1,175 @@
+<!DOCTYPE HTML>
+<html lang="en" class="h-100">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Bootstrap CSS -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+	crossorigin="anonymous">
+<title>Migel</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body class="d-flex flex-column h-100">
+	 <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Migel</a>
+            
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                 	<a class="nav-link" href="index.html">Index</a>
+                    <a class="nav-link active" aria-current="page" href="ueberpruefen.html">Ueberpruefen</a>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-block" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+	<div class="container">
+		<br />
+		<div class="row">
+			<div class="col">
+				<h1 style="text-align: center">Migel</h1>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-1">
+				Upload:
+			</div>
+			<div class="col-4">
+				<input class="form-control" type="file" id="file" accept=".xml"/>
+			</div>
+			<div class="col-2">
+				<input type="submit" value="Upload" class="btn btn-primary"  onclick="uploadFile()">
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-1">
+				Upload:
+			</div>
+			<div class="col-4">
+				<textarea class="form-control" id="text" ></textarea>
+			</div>
+			<div class="col-2">
+				<input type="submit" value="Upload" class="btn btn-primary"  onclick="uploadFile2()">
+			</div>
+		</div>
+		<br>
+	
+		<div class="row">
+            <div class="col-12" id="token" style="word-break:break-all">
+            </div>
+        </div>
+		<br>
+		 <div class="row">
+            <div class="col-4 offset-4" id="fehler" style="color: red; text-align: center">
+            </div>
+        </div>
+		<div class="row">
+			<table class="table">
+				<tbody id="table">
+					
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="container footer mt-auto">
+            <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+                <div class="col-md-4 d-flex align-items-center">
+
+                    <span class="text-muted">&copy; 2022 Fuchsgroup Consulting AG</span>
+                </div>
+
+            </footer>
+        </div>
+	<!-- Bootstrap JS -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+		crossorigin="anonymous"></script>
+
+</body>
+<script>
+var token = sessionStorage.getItem("tokenKey");
+document.getElementById("token").innerHTML = "Token: " + token;
+if(token == null){
+	window.location = "Login.html"
+}
+function logout(){
+	sessionStorage.clear();
+	window.location = "login.html";
+}
+function uploadFile(){
+	document.getElementById("fehler").innerHTML = ""
+	var file = document.getElementById("file").files[0];
+    var formData = new FormData();
+    formData.append("file", file);
+    fetch("migel/xml", {
+        method: "POST",
+        body: formData,
+        headers: {
+            'Authorization': token
+        }
+    })
+    .then(response => {
+    	if(response.status == 400){
+    		document.getElementById("fehler").innerHTML = "Fehler beim Lesen des Files.";
+    		document.getElementById("table").innerHTML = "";
+            throw new Error("HTTP status " + response.status);
+		}else{
+			return response.json();
+		}
+    })
+    .then(data => {
+       		macheTabelle(data);
+        })
+    .catch((error) => {
+    	
+   	});
+}
+function uploadFile2(){
+	document.getElementById("fehler").innerHTML = ""
+	var text = document.getElementById("text").value;
+    fetch("migel/xml/string", {
+        method: "POST",
+        body: text,
+        headers: {
+            'Authorization': token
+        }
+    })
+    .then(response => {
+    	if(response.status == 400){
+    		document.getElementById("fehler").innerHTML = "Fehler beim Lesen des Files.";
+    		 document.getElementById("table").innerHTML = "";
+            throw new Error("HTTP status " + response.status);
+		}else{
+			return response.json();
+		}
+    })
+    .then(data => {
+       		macheTabelle(data);
+        })
+    .catch((error) => {
+    	
+   	});
+}
+function macheTabelle(text){
+	var tabelle = document.getElementById("table");
+    tabelle.innerHTML = "";
+    text.forEach(t => {
+        var tr = document.createElement("tr");
+
+        var tdMigel = document.createElement("td");
+        tdMigel.innerHTML = t;
+        tr.appendChild(tdMigel);
+		
+        tabelle.appendChild(tr);
+    })
+}
+</script>
+</html>
