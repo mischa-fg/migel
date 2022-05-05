@@ -55,13 +55,18 @@ public class ReadXml {
                 	
                 	  if(produkt.getHvbPflege().compareTo(BigDecimal.valueOf(Double.parseDouble(element.getAttribute("unit"))))<0) {
                 		 // s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", Nicht OK";
-                		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", HVB " +BigDecimal.valueOf(Double.parseDouble(element.getAttribute("unit"))).subtract(produkt.getHvbPflege())+ " zu viel";
+                		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", HVB " +BigDecimal.valueOf(Double.parseDouble(element.getAttribute("unit"))).subtract(produkt.getHvbPflege())+ " zu viel, "+produkt.getHvbPflege();
                 	  }else {
                 		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", OK";
                 	  }
                 	  
                   }else {
-                	  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", "+ "Keine Daten";
+                	  if(produktService.getProdukte(element.getAttribute("code")).size() > 0) {
+                		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", "+ "Keine Daten für diesen Zeitraum";
+                	  }else {
+                		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", Migelnummer unbekannt";
+                	  }
+                	  
                   }
                   output.add(s);
               }
@@ -89,13 +94,18 @@ public class ReadXml {
                 	  Produkt produkt = produkte.get(0);
                 	
                 	  if(produkt.getHvbPflege().compareTo(BigDecimal.valueOf(Double.parseDouble(element.getAttribute("unit"))))<0) {
-                		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", HVB " +BigDecimal.valueOf(Double.parseDouble(element.getAttribute("unit"))).subtract(produkt.getHvbPflege())+ " zu viel";
-                	  }else {
-                		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", OK";
-                	  }
-                	  
-                  }else {
-                	  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", "+ "Keine Daten";
+                 		 // s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", Nicht OK";
+                 		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", HVB " +BigDecimal.valueOf(Double.parseDouble(element.getAttribute("unit"))).subtract(produkt.getHvbPflege())+ " zu viel, "+produkt.getHvbPflege();
+                 	  }else {
+                 		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", OK";
+                 	  }
+                 	  
+                   }else {
+                 	  if(produktService.getProdukte(element.getAttribute("code")).size() > 0) {
+                 		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", "+ "Keine Daten für diesen Zeitraum";
+                 	  }else {
+                 		  s = element.getAttribute("record_id")+ ", " +element.getAttribute("code")+", " + element.getAttribute("date_begin")+ ", Migelnummer unbekannt";
+                 	  }
                   }
                   output.add(s);
               }
